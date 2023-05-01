@@ -5,12 +5,13 @@ impl Rerepl {
     pub(crate) fn run_as_child(&self) {
         let mut input = String::new();
         loop {
+            input.clear();
             io::stdin().read_line(&mut input).unwrap();
             let input = input.trim_start();
             if input.is_empty() {
                 continue;
             }
-            let cmd = input.splitn(2, ' ').take(1).next();
+            let cmd = input.split_whitespace().next();
             match cmd {
                 None => {
                     continue;
@@ -34,9 +35,10 @@ impl Rerepl {
     }
 
     fn print_help(&self) {
-        println!("Available commands:");
+        print!("Available commands:");
         for cmd in self.handlers.keys() {
-            println!("\t{}", cmd);
+            print!("\t{}", cmd);
         }
+        println!();
     }
 }

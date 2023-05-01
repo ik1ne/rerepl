@@ -1,11 +1,9 @@
 use std::collections::HashMap;
 
-use crate::error::Error;
-
 mod child;
 mod parent;
 
-const RERUN_ENVVAR: &str = "REREPL_RERUN";
+const IS_CHILD_ENVVAR: &str = "REREPL_IS_CHILD";
 
 pub type Handler = Box<dyn Fn(&str)>;
 
@@ -16,14 +14,12 @@ pub struct Rerepl {
 
 impl Rerepl {
     pub fn init(prompt: String) -> Self {
-        if Self::is_parent() {
-            Self::init_as_parent();
-        }
-
-        Self {
+        let rerepl = Self {
             prompt,
             handlers: Default::default(),
-        }
+        };
+
+        rerepl
     }
 
     pub fn add_handler(&mut self, cmd: &str, handler: Handler) {
@@ -31,7 +27,7 @@ impl Rerepl {
     }
 
     pub fn is_parent() -> bool {
-        std::env::var(RERUN_ENVVAR).is_ok()
+        std::env::var(IS_CHILD_ENVVAR).is_err()
     }
 
     pub fn run(&self) {
