@@ -30,11 +30,11 @@ impl Rerepl {
         std::env::var(IS_CHILD_ENVVAR).is_err()
     }
 
-    pub fn run(&self) {
+    pub fn run(&mut self) -> Result<(), anyhow::Error> {
         if Self::is_parent() {
-            self.run_as_parent();
+            self.run_as_parent()
         } else {
-            self.run_as_child();
+            self.run_as_child()
         }
     }
 }

@@ -4,7 +4,7 @@ use rerepl::prelude::*;
 
 #[tokio::main]
 async fn main() {
-    let mut rerepl = Rerepl::init("Command >".to_string());
+    let mut rerepl = Rerepl::init("Command>".to_string());
 
     if Rerepl::is_parent() {
         // initialization for parent process does not exist

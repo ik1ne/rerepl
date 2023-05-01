@@ -47,7 +47,6 @@ fn main() {
                             cursor::MoveToColumn((cursor_idx + PROMPT.len()) as u16)
                         )
                         .unwrap();
-                    // +2 to account for the "> " prompt
                     } else {
                         // Insert character at the cursor position
                         buffer.insert(cursor_idx, c);

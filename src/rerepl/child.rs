@@ -2,7 +2,7 @@ use crate::rerepl::Rerepl;
 use std::io;
 
 impl Rerepl {
-    pub(crate) fn run_as_child(&self) {
+    pub(crate) fn run_as_child(&self)  -> Result<(), anyhow::Error>{
         let mut input = String::new();
         loop {
             input.clear();
@@ -32,6 +32,8 @@ impl Rerepl {
                 }
             }
         }
+
+        Ok(())
     }
 
     fn print_help(&self) {
