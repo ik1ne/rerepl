@@ -1,5 +1,6 @@
 use std::io::{stdout, Write};
 
+use crossterm::event::KeyModifiers;
 use crossterm::{
     cursor::{self, MoveLeft, MoveRight},
     event::{self, Event, KeyCode, KeyEvent},
@@ -22,25 +23,49 @@ fn main() {
 
     loop {
         // Read user input
-        if let Event::Key(KeyEvent { code, .. }) = event::read().unwrap() {
+        if let Event::Key(KeyEvent {
+            code, modifiers, ..
+        }) = event::read().unwrap()
+        {
             match code {
                 KeyCode::Char(c) => {
-                    // Insert character at the cursor position
-                    buffer.insert(cursor_idx, c);
-                    cursor_idx += 1;
-                    execute!(
-                        stdout,
-                        cursor::MoveToColumn(0),
-                        Clear(ClearType::CurrentLine)
-                    )
-                    .unwrap();
-                    print!("> {}", buffer); // Include the prompt before the buffer
-                    stdout.flush().unwrap();
-                    execute!(
-                        stdout,
-                        cursor::MoveToColumn((cursor_idx + PROMPT.len()) as u16)
-                    )
-                    .unwrap();
+                    if c == 'b' && modifiers.contains(KeyModifiers::CONTROL) {
+                        // Backup buffer when pressing Ctrl+B
+                        execute!(
+                            stdout,
+                            cursor::MoveToColumn(0),
+                            Clear(ClearType::CurrentLine)
+                        )
+                        .unwrap();
+                        println!("{}", buffer);
+                        execute!(stdout, cursor::MoveToColumn(0), cursor::MoveToNextLine(1))
+                            .unwrap();
+                        print!("{}{}", PROMPT, buffer);
+                        stdout.flush().unwrap();
+                        execute!(
+                            stdout,
+                            cursor::MoveToColumn((cursor_idx + PROMPT.len()) as u16)
+                        )
+                        .unwrap();
+                    // +2 to account for the "> " prompt
+                    } else {
+                        // Insert character at the cursor position
+                        buffer.insert(cursor_idx, c);
+                        cursor_idx += 1;
+                        execute!(
+                            stdout,
+                            cursor::MoveToColumn(0),
+                            Clear(ClearType::CurrentLine)
+                        )
+                        .unwrap();
+                        print!("> {}", buffer); // Include the prompt before the buffer
+                        stdout.flush().unwrap();
+                        execute!(
+                            stdout,
+                            cursor::MoveToColumn((cursor_idx + PROMPT.len()) as u16)
+                        )
+                        .unwrap();
+                    }
                 }
                 KeyCode::Backspace => {
                     if cursor_idx > 0 {
